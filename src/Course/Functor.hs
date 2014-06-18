@@ -29,12 +29,8 @@ infixl 4 <$>
 -- >>> (+1) <$> Id 2
 -- Id 3
 instance Functor Id where
-  (<$>) ::
-    (a -> b)
-    -> Id a
-    -> Id b
-  (<$>) =
-    error "todo"
+  (<$>) :: (a -> b) -> Id a -> Id b
+  (<$>) f a = mapId f a
 
 -- | Maps a function on the List functor.
 --
@@ -44,12 +40,8 @@ instance Functor Id where
 -- >>> (+1) <$> (1 :. 2 :. 3 :. Nil)
 -- [2,3,4]
 instance Functor List where
-  (<$>) ::
-    (a -> b)
-    -> List a
-    -> List b
-  (<$>) =
-    error "todo"
+  (<$>) :: (a -> b) -> List a -> List b
+  (<$>) f a = map f a
 
 -- | Maps a function on the Optional functor.
 --
@@ -59,24 +51,16 @@ instance Functor List where
 -- >>> (+1) <$> Full 2
 -- Full 3
 instance Functor Optional where
-  (<$>) ::
-    (a -> b)
-    -> Optional a
-    -> Optional b
-  (<$>) =
-    error "todo"
+  (<$>) :: (a -> b) -> Optional a -> Optional b
+  (<$>) f a = mapOptional f a
 
 -- | Maps a function on the reader ((->) t) functor.
 --
 -- >>> ((+1) <$> (*2)) 8
 -- 17
 instance Functor ((->) t) where
-  (<$>) ::
-    (a -> b)
-    -> ((->) t a)
-    -> ((->) t b)
-  (<$>) =
-    error "todo"
+  (<$>) :: (a -> b) -> ((->) t a) -> ((->) t b)
+  (<$>) f r = f . r
 
 -- | Anonymous map. Maps a constant value on a functor.
 --
@@ -86,13 +70,8 @@ instance Functor ((->) t) where
 -- prop> x <$ [a,b,c] == [x,x,x]
 --
 -- prop> x <$ Full q == Full x
-(<$) ::
-  Functor f =>
-  a
-  -> f b
-  -> f a
-(<$) =
-  error "todo"
+(<$) :: Functor f => a -> f b -> f a
+(<$) x fy = const x <$> fy
 
 -- | Anonymous map producing unit value.
 --
