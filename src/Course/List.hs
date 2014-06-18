@@ -28,9 +28,8 @@ import qualified Numeric as N
 -- BEGIN Helper functions and data types
 
 -- The custom list type
-data List t =
-  Nil
-  | t :. List t
+data List t = Nil
+            | t :. List t
   deriving (Eq, Ord)
 
 -- Right-associative
@@ -68,12 +67,8 @@ foldLeft f b (h :. t) = let b' = f b h in b' `seq` foldLeft f b' t
 -- prop> x `headOr` infinity == 0
 --
 -- prop> x `headOr` Nil == x
-headOr ::
-  a
-  -> List a
-  -> a
-headOr =
-  error "todo"
+headOr :: a -> List a -> a
+headOr = foldLeft (\x _ -> x) -- TODO: This anonymous function here is dumb.
 
 -- | The product of the elements of a list.
 --
@@ -82,11 +77,8 @@ headOr =
 --
 -- >>> product (1 :. 2 :. 3 :. 4 :. Nil)
 -- 24
-product ::
-  List Int
-  -> Int
-product =
-  error "todo"
+product :: List Int -> Int
+product = foldLeft (*) 1
 
 -- | Sum the elements of the list.
 --
@@ -97,11 +89,8 @@ product =
 -- 10
 --
 -- prop> foldLeft (-) (sum x) x == 0
-sum ::
-  List Int
-  -> Int
-sum =
-  error "todo"
+sum :: List Int -> Int
+sum = foldLeft (+) 0
 
 -- | Return the length of the list.
 --
@@ -109,11 +98,8 @@ sum =
 -- 3
 --
 -- prop> sum (map (const 1) x) == length x
-length ::
-  List a
-  -> Int
-length =
-  error "todo"
+length :: List a -> Int
+length = foldLeft (\x _ -> x + 1) 0 -- TODO: This is kind of horrific.
 
 -- | Map the given function on each element of the list.
 --
@@ -123,12 +109,8 @@ length =
 -- prop> headOr x (map (+1) infinity) == 1
 --
 -- prop> map id x == x
-map ::
-  (a -> b)
-  -> List a
-  -> List b
-map =
-  error "todo"
+map :: (a -> b) -> List a -> List b
+map f = foldRight (\x xs -> f x :. xs) Nil
 
 -- | Return elements satisfying the given predicate.
 --
@@ -140,12 +122,8 @@ map =
 -- prop> filter (const True) x == x
 --
 -- prop> filter (const False) x == Nil
-filter ::
-  (a -> Bool)
-  -> List a
-  -> List a
-filter =
-  error "todo"
+filter :: (a -> Bool) -> List a -> List a
+filter f = foldRight (\x xs -> if (f x) then (x :. xs) else xs) Nil
 
 -- | Append two lists to a new list.
 --
@@ -159,12 +137,8 @@ filter =
 -- prop> (x ++ y) ++ z == x ++ (y ++ z)
 --
 -- prop> x ++ Nil == x
-(++) ::
-  List a
-  -> List a
-  -> List a
-(++) =
-  error "todo"
+(++) :: List a -> List a -> List a
+(++) = flip (foldLeft (\xs x -> x :. xs))
 
 infixr 5 ++
 
