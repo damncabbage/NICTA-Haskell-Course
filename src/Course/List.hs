@@ -198,11 +198,11 @@ flattenAgain = flatMap (id)
 -- >>> seqOptional (Empty :. map Full infinity)
 -- Empty
 seqOptional :: List (Optional a) -> Optional (List a)
-seqOptional la = foldRight fr (Full Nil) la
+seqOptional la = foldRight recombine (Full Nil) la
   where
-    fr Empty _            = Empty
-    fr _ Empty            = Empty
-    fr (Full x) (Full xs) = Full (x :. xs)
+    recombine Empty _            = Empty
+    recombine _ Empty            = Empty
+    recombine (Full x) (Full xs) = Full (x :. xs)
 
 
 -- | Find the first element in the list matching the predicate.
@@ -221,12 +221,8 @@ seqOptional la = foldRight fr (Full Nil) la
 --
 -- >>> find (const True) infinity
 -- Full 0
-find ::
-  (a -> Bool)
-  -> List a
-  -> Optional a
-find =
-  error "todo"
+find :: (a -> Bool) -> List a -> Optional a
+find f la = foldRight (\x xs -> if (f x) then Full x else xs) Empty la
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -241,11 +237,8 @@ find =
 --
 -- >>> lengthGT4 infinity
 -- True
-lengthGT4 ::
-  List a
-  -> Bool
-lengthGT4 =
-  error "todo"
+lengthGT4 :: List a -> Bool
+lengthGT4 la = (length la) > 4
 
 -- | Reverse a list.
 --
@@ -255,11 +248,8 @@ lengthGT4 =
 -- prop> let types = x :: List Int in reverse x ++ reverse y == reverse (y ++ x)
 --
 -- prop> let types = x :: Int in reverse (x :. Nil) == x :. Nil
-reverse ::
-  List a
-  -> List a
-reverse =
-  error "todo"
+reverse :: List a -> List a
+reverse = foldLeft (\xs x -> x :. xs) Nil
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -269,12 +259,9 @@ reverse =
 --
 -- >>> let (x:.y:.z:.w:._) = produce (*2) 1 in [x,y,z,w]
 -- [1,2,4,8]
-produce ::
-  (a -> a)
-  -> a
-  -> List a
-produce =
-  error "todo"
+produce :: (a -> a) -> a -> List a
+produce f a = foldRight (\x _ -> x :. (produce f (f x))) Nil (a :. Nil)
+-- TODO: This is hideous. ----^
 
 -- | Do anything other than reverse a list.
 -- Is it even possible?
@@ -285,11 +272,8 @@ produce =
 -- prop> let types = x :: List Int in notReverse x ++ notReverse y == notReverse (y ++ x)
 --
 -- prop> let types = x :: Int in notReverse (x :. Nil) == x :. Nil
-notReverse ::
-  List a
-  -> List a
-notReverse =
-  error "todo"
+notReverse :: List a -> List a
+notReverse = foldRight (:.) Nil
 
 hlist ::
   List a
