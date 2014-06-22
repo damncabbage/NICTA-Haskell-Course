@@ -152,11 +152,8 @@ infixr 5 ++
 -- prop> headOr x (flatten (y :. infinity :. Nil)) == headOr 0 y
 --
 -- prop> sum (map length x) == length (flatten x)
-flatten ::
-  List (List a)
-  -> List a
-flatten =
-  error "todo"
+flatten :: List (List a) -> List a
+flatten = foldRight (++) Nil
 
 -- | Map a function then flatten to a list.
 --
@@ -168,22 +165,15 @@ flatten =
 -- prop> headOr x (flatMap id (y :. infinity :. Nil)) == headOr 0 y
 --
 -- prop> flatMap id (x :: List (List Int)) == flatten x
-flatMap ::
-  (a -> List b)
-  -> List a
-  -> List b
-flatMap =
-  error "todo"
+flatMap :: (a -> List b) -> List a -> List b
+flatMap fab a = flatten (map fab a)
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
 --
 -- prop> let types = x :: List (List Int) in flatten x == flattenAgain x
-flattenAgain ::
-  List (List a)
-  -> List a
-flattenAgain =
-  error "todo"
+flattenAgain :: List (List a) -> List a
+flattenAgain = flatMap (id)
 
 -- | Convert a list of optional values to an optional list of values.
 --
@@ -207,11 +197,13 @@ flattenAgain =
 --
 -- >>> seqOptional (Empty :. map Full infinity)
 -- Empty
-seqOptional ::
-  List (Optional a)
-  -> Optional (List a)
-seqOptional =
-  error "todo"
+seqOptional :: List (Optional a) -> Optional (List a)
+seqOptional la = foldRight fr (Full Nil) la
+  where
+    fr Empty _            = Empty
+    fr _ Empty            = Empty
+    fr (Full x) (Full xs) = Full (x :. xs)
+
 
 -- | Find the first element in the list matching the predicate.
 --
