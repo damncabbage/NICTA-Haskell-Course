@@ -110,7 +110,7 @@ length = foldLeft (\x _ -> x + 1) 0 -- TODO: This is kind of horrific.
 --
 -- prop> map id x == x
 map :: (a -> b) -> List a -> List b
-map f = foldRight (\x xs -> f x :. xs) Nil
+map f = foldRight (\x xs -> (f x) :. xs) Nil
 
 -- | Return elements satisfying the given predicate.
 --
@@ -138,7 +138,7 @@ filter f = foldRight (\x xs -> if (f x) then (x :. xs) else xs) Nil
 --
 -- prop> x ++ Nil == x
 (++) :: List a -> List a -> List a
-(++) = flip (foldLeft (\xs x -> x :. xs))
+(++) a1 a2 = foldRight (:.) a2 a1
 
 infixr 5 ++
 
