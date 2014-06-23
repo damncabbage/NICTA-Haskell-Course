@@ -25,24 +25,16 @@ infixl 4 <*>
 -- >>> Id (+10) <*> Id 8
 -- Id 18
 instance Apply Id where
-  (<*>) ::
-    Id (a -> b)
-    -> Id a
-    -> Id b
-  (<*>) =
-    error "todo"
+  (<*>) :: Id (a -> b) -> Id a -> Id b
+  (<*>) (Id f) (Id a) = Id (f a)
 
 -- | Implement @Apply@ instance for @List@.
 --
 -- >>> (+1) :. (*2) :. Nil <*> 1 :. 2 :. 3 :. Nil
 -- [2,3,4,2,4,6]
 instance Apply List where
-  (<*>) ::
-    List (a -> b)
-    -> List a
-    -> List b
-  (<*>) =
-    error "todo"
+  (<*>) :: List (a -> b) -> List a -> List b
+  (<*>) f a = flatMap (\ff -> map ff a) f
 
 -- | Implement @Apply@ instance for @Optional@.
 --
@@ -55,12 +47,8 @@ instance Apply List where
 -- >>> Full (+8) <*> Empty
 -- Empty
 instance Apply Optional where
-  (<*>) ::
-    Optional (a -> b)
-    -> Optional a
-    -> Optional b
-  (<*>) =
-    error "todo"
+  (<*>) :: Optional (a -> b) -> Optional a -> Optional b
+  (<*>) f a = (bindOptional (\ff -> mapOptional ff a)) f
 
 -- | Implement @Apply@ instance for reader.
 --
@@ -79,12 +67,10 @@ instance Apply Optional where
 -- >>> ((*) <*> (+2)) 3
 -- 15
 instance Apply ((->) t) where
-  (<*>) ::
-    ((->) t (a -> b))
-    -> ((->) t a)
-    -> ((->) t b)
-  (<*>) =
-    error "todo"
+  (<*>) :: ((->) t (a -> b)) -> ((->) t a) -> ((->) t b)
+  -- <*> :: (\t -> (a -> b)) -> (\t -> a) -> (\t -> b)
+  -- <*> :: (t -> a -> b) -> (t -> a) -> (t -> b)
+  (<*>) fab fa = (\t -> fab t (fa t))
 
 -- | Apply a binary function in the environment.
 --
@@ -105,14 +91,9 @@ instance Apply ((->) t) where
 --
 -- >>> lift2 (+) length sum (listh [4,5,6])
 -- 18
-lift2 ::
-  Apply f =>
-  (a -> b -> c)
-  -> f a
-  -> f b
-  -> f c
-lift2 =
-  error "todo"
+lift2 :: Apply f => (a -> b -> c) -> f a -> f b -> f c
+lift2 fabc fa fb = error "todo" -- (\x -> fabc (fa x)) <*> fb ? :(
+
 
 -- | Apply a ternary function in the Monad environment.
 --
