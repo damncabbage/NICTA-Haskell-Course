@@ -61,6 +61,7 @@ instance Functor Optional where
 instance Functor ((->) t) where
   (<$>) :: (a -> b) -> ((->) t a) -> ((->) t b)
   (<$>) f r = f . r
+-- (<$>) f r = (\x -> f (r x)) -- Equivalent to the above.
 
 -- | Anonymous map. Maps a constant value on a functor.
 --
@@ -71,7 +72,7 @@ instance Functor ((->) t) where
 --
 -- prop> x <$ Full q == Full x
 (<$) :: Functor f => a -> f b -> f a
-(<$) x fy = const x <$> fy
+(<$) x fy = (\_ -> x) <$> fy
 
 -- | Anonymous map producing unit value.
 --
