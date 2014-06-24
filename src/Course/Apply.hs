@@ -4,6 +4,7 @@
 
 module Course.Apply where
 
+import Course.Helpers
 import Course.Core
 import Course.Functor
 import Course.Id
@@ -92,7 +93,7 @@ instance Apply ((->) t) where
 -- >>> lift2 (+) length sum (listh [4,5,6])
 -- 18
 lift2 :: Apply f => (a -> b -> c) -> f a -> f b -> f c
-lift2 fabc fa fb = error "todo" -- (\x -> fabc (fa x)) <*> fb ? :(
+lift2 abc fa fb = (abc <$> fa) <*> fb
 
 
 -- | Apply a ternary function in the Monad environment.
@@ -117,15 +118,8 @@ lift2 fabc fa fb = error "todo" -- (\x -> fabc (fa x)) <*> fb ? :(
 --
 -- >>> lift3 (\a b c -> a + b + c) length sum product (listh [4,5,6])
 -- 138
-lift3 ::
-  Apply f =>
-  (a -> b -> c -> d)
-  -> f a
-  -> f b
-  -> f c
-  -> f d
-lift3 =
-  error "todo"
+lift3 :: Apply f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
+lift3 abcd fa fb fc = abcd <$> fa <*> fb <*> fc -- (ノ ゜Д゜)ノ ︵ ┻━┻
 
 -- | Apply a quaternary function in the environment.
 --
@@ -157,8 +151,8 @@ lift4 ::
   -> f c
   -> f d
   -> f e
-lift4 =
-  error "todo"
+lift4 abcde fa fb fc fd =
+  abcde <$> fa <*> fb <*> fc <*> fd -- Oh come on.
 
 -- | Sequence, discarding the value of the first argument.
 -- Pronounced, right apply.
@@ -178,13 +172,9 @@ lift4 =
 -- prop> [a,b,c] *> [x,y,z] == [x,y,z,x,y,z,x,y,z]
 --
 -- prop> Full x *> Full y == Full y
-(*>) ::
-  Apply f =>
-  f a
-  -> f b
-  -> f b
-(*>) =
-  error "todo"
+(*>) :: Apply f => f a -> f b -> f b
+(*>) _ fb = fb
+
 
 -- | Sequence, discarding the value of the second argument.
 -- Pronounced, left apply.
@@ -204,13 +194,8 @@ lift4 =
 -- prop> [x,y,z] <* [a,b,c] == [x,x,x,y,y,y,z,z,z]
 --
 -- prop> Full x <* Full y == Full x
-(<*) ::
-  Apply f =>
-  f b
-  -> f a
-  -> f b
-(<*) =
-  error "todo"
+(<*) :: Apply f => f b -> f a -> f b
+(<*) fb _ = fb
 
 -----------------------
 -- SUPPORT LIBRARIES --
