@@ -10,6 +10,7 @@ module Course.Bind(
 , (<=<)
 ) where
 
+import Course.Helpers
 import Course.Core
 import Course.Functor
 import Course.Apply(Apply)
@@ -58,13 +59,8 @@ infixr 1 =<<
 --
 -- >>> ((*) <*> (+2)) 3
 -- 15
-(<*>) ::
-  Bind f =>
-  f (a -> b)
-  -> f a
-  -> f b
-(<*>) =
-  error "todo"
+(<*>) :: Bind f => f (a -> b) -> f a -> f b
+(<*>) fab fa = (\x -> x <$> fa) =<< fab
 
 infixl 4 <*>
 
@@ -73,48 +69,32 @@ infixl 4 <*>
 -- >>> (\x -> Id(x+1)) =<< Id 2
 -- Id 3
 instance Bind Id where
-  (=<<) ::
-    (a -> Id b)
-    -> Id a
-    -> Id b
-  (=<<) =
-    error "todo"
+  (=<<) :: (a -> Id b) -> Id a -> Id b
+  f =<< (Id a) = f a
 
 -- | Binds a function on a List.
 --
 -- >>> (\n -> n :. n :. Nil) =<< (1 :. 2 :. 3 :. Nil)
 -- [1,1,2,2,3,3]
 instance Bind List where
-  (=<<) ::
-    (a -> List b)
-    -> List a
-    -> List b
-  (=<<) =
-    error "todo"
+  (=<<) :: (a -> List b) -> List a -> List b
+  f =<< la = flatMap f la
 
 -- | Binds a function on an Optional.
 --
 -- >>> (\n -> Full (n + n)) =<< Full 7
 -- Full 14
 instance Bind Optional where
-  (=<<) ::
-    (a -> Optional b)
-    -> Optional a
-    -> Optional b
-  (=<<) =
-    error "todo"
+  (=<<) :: (a -> Optional b) -> Optional a -> Optional b
+  (=<<) = bindOptional
 
 -- | Binds a function on the reader ((->) t).
 --
 -- >>> ((*) =<< (+10)) 7
 -- 119
 instance Bind ((->) t) where
-  (=<<) ::
-    (a -> ((->) t b))
-    -> ((->) t a)
-    -> ((->) t b)
-  (=<<) =
-    error "todo"
+  (=<<) :: (a -> ((->) t b)) -> ((->) t a) -> ((->) t b)
+  (=<<) ffab fa = (\t -> ffab (fa t) t)
 
 -- | Flattens a combined structure to a single structure.
 --
