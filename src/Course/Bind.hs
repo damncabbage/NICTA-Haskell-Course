@@ -109,12 +109,8 @@ instance Bind ((->) t) where
 --
 -- >>> join (+) 7
 -- 14
-join ::
-  Bind f =>
-  f (f a)
-  -> f a
-join =
-  error "todo"
+join :: Bind f => f (f a) -> f a
+join ffa = (\x -> x) =<< ffa  -- (f a -> f a) =<< f (f a)
 
 -- | Implement a flipped version of @(=<<)@, however, use only
 -- @join@ and @(<$>)@.
@@ -122,13 +118,8 @@ join =
 --
 -- >>> ((+10) >>= (*)) 7
 -- 119
-(>>=) ::
-  Bind f =>
-  f a
-  -> (a -> f b)
-  -> f b
-(>>=) =
-  error "todo"
+(>>=) :: Bind f => f a -> (a -> f b) -> f b
+fa >>= afb = join (afb <$> fa)
 
 infixl 1 >>=
 
