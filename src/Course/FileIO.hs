@@ -63,7 +63,7 @@ the contents of c
 main ::
   IO ()
 main =
-  error "todo"
+  printFile "a.txt" "foo bar"
 
 type FilePath =
   Chars
@@ -93,10 +93,8 @@ printFiles ::
 printFiles =
   error "todo"
 
-printFile ::
-  FilePath
-  -> Chars
-  -> IO ()
-printFile =
-  error "todo"
+printFile :: FilePath -> Chars -> IO ()
+printFile path contents =
+  putStrLn ("============ " ++ path) >>
+  putStrLn contents
 
