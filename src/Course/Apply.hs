@@ -173,7 +173,7 @@ lift4 abcde fa fb fc fd =
 --
 -- prop> Full x *> Full y == Full y
 (*>) :: Apply f => f a -> f b -> f b
-(*>) _ fb = fb
+(*>) fa fb = lift2 (const id) fa fb
 
 
 -- | Sequence, discarding the value of the second argument.
